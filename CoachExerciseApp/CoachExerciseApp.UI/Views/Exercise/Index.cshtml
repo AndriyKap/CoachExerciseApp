@@ -1,0 +1,84 @@
+﻿@model IEnumerable<CoachExerciseApp.UI.Models.ExerciseWithUrlModel>
+
+<h1 class="mt-3">Exercises</h1>
+
+<div class="d-flex justify-content-start">
+    <a class="btn btn-primary" asp-controller="Exercise" asp-action="Add">Add new exercise</a>
+</div>
+
+<div class="container">
+    <div class="row">
+        @foreach (var item in Model)
+        {
+            <div class="col-3 mt-3">
+                <div class="card">
+                    <div class="card-header">
+                        Exercise Url:
+                        <i class="bi bi-box-arrow-up-right exercise-url" style="cursor: pointer; font-size: 18px; margin-left: 10px;" data-url="@item.UniqueUrl" title="Copy URL"></i>
+                        <span class="copy-message" style="display: none;">Copied</span>
+                    </div>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item"><strong>Client name: </strong>@item.ClientName</li>
+                        <li class="list-group-item"><strong>Description: </strong>@item.Description</li>
+                        <li class="list-group-item"><strong>Due date: </strong>@item.Date</li>
+                        @if (item.Feedback is not null)
+                        {
+                            <li class="list-group-item"><strong>Client feedback: </strong>@item.Feedback</li>
+                        }
+                    </ul>
+                    <div class="card-footer text-center" style="background-color: @GetStatusColor(item.Status)">
+                        @item.Status
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@functions {
+    public string GetStatusColor(string status)
+    {
+        switch (status)
+        {
+            case "PENDING":
+                return "#75AAF0";
+            case "DONE":
+                return "#32CD32";
+            case "MISSED":
+                return "#FF0000";
+            default:
+                return "#000000";
+        }
+    }
+}
+
+
+<script>
+    document.querySelectorAll('.exercise-url').forEach(item => {
+        item.addEventListener('click', event => {
+            event.preventDefault();
+
+            const url = item.getAttribute('data-url');
+
+            const textarea = document.createElement('textarea');
+            textarea.value = url;
+
+            document.body.appendChild(textarea);
+
+            textarea.select();
+            document.execCommand('copy');
+
+            document.body.removeChild(textarea);
+
+            item.style.color = 'green'; 
+
+            const copyMessage = item.parentElement.querySelector('.copy-message');
+            copyMessage.style.display = 'inline';
+
+            setTimeout(() => {
+                item.style.color = ''; 
+                copyMessage.style.display = 'none'; 
+            }, 1000);
+        });
+    });
+</script>
